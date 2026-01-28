@@ -30,7 +30,7 @@ model Task {
 
 enum TaskStatus {
   pending
-  in-progress
+  in_progress
   done
 }
 
