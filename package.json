@@ -1,0 +1,18 @@
+{
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.3.0",
+    "@prisma/client": "^7.3.0",
+    "elysia": "^1.4.22",
+    "pg": "^8.17.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.10",
+    "@types/pg": "^8.16.0",
+    "dotenv": "^17.2.3",
+    "prisma": "^7.3.0",
+    "prismabox": "^1.1.26"
+  },
+  "scripts": {
+    "dev": "bun run src/index.ts"
+  }
+}

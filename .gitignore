@@ -1,0 +1,9 @@
+# Node / Package managers
+node_modules/
+
+# Bun
+bun.lockb
+
+#.env
+.env
+/generated/prisma
