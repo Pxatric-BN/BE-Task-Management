@@ -10,11 +10,11 @@ export const TaskPlain = t.Object(
     title: t.String(),
     description: __nullable__(t.String()),
     status: t.Union(
-      [t.Literal("PENDING"), t.Literal("IN_PROGRESS"), t.Literal("DONE")],
+      [t.Literal("pending"), t.Literal("in_progress"), t.Literal("done")],
       { additionalProperties: false },
     ),
     priority: t.Union(
-      [t.Literal("LOW"), t.Literal("MEDIUM"), t.Literal("HIGH")],
+      [t.Literal("low"), t.Literal("medium"), t.Literal("high")],
       { additionalProperties: false },
     ),
     dueDate: t.Date(),
@@ -32,12 +32,12 @@ export const TaskPlainInputCreate = t.Object(
     description: t.Optional(__nullable__(t.String())),
     status: t.Optional(
       t.Union(
-        [t.Literal("PENDING"), t.Literal("IN_PROGRESS"), t.Literal("DONE")],
+        [t.Literal("pending"), t.Literal("in_progress"), t.Literal("done")],
         { additionalProperties: false },
       ),
     ),
     priority: t.Optional(
-      t.Union([t.Literal("LOW"), t.Literal("MEDIUM"), t.Literal("HIGH")], {
+      t.Union([t.Literal("low"), t.Literal("medium"), t.Literal("high")], {
         additionalProperties: false,
       }),
     ),
@@ -52,12 +52,12 @@ export const TaskPlainInputUpdate = t.Object(
     description: t.Optional(__nullable__(t.String())),
     status: t.Optional(
       t.Union(
-        [t.Literal("PENDING"), t.Literal("IN_PROGRESS"), t.Literal("DONE")],
+        [t.Literal("pending"), t.Literal("in_progress"), t.Literal("done")],
         { additionalProperties: false },
       ),
     ),
     priority: t.Optional(
-      t.Union([t.Literal("LOW"), t.Literal("MEDIUM"), t.Literal("HIGH")], {
+      t.Union([t.Literal("low"), t.Literal("medium"), t.Literal("high")], {
         additionalProperties: false,
       }),
     ),
@@ -87,11 +87,11 @@ export const TaskWhere = t.Partial(
           title: t.String(),
           description: t.String(),
           status: t.Union(
-            [t.Literal("PENDING"), t.Literal("IN_PROGRESS"), t.Literal("DONE")],
+            [t.Literal("pending"), t.Literal("in_progress"), t.Literal("done")],
             { additionalProperties: false },
           ),
           priority: t.Union(
-            [t.Literal("LOW"), t.Literal("MEDIUM"), t.Literal("HIGH")],
+            [t.Literal("low"), t.Literal("medium"), t.Literal("high")],
             { additionalProperties: false },
           ),
           dueDate: t.Date(),
@@ -137,14 +137,14 @@ export const TaskWhereUnique = t.Recursive(
               description: t.String(),
               status: t.Union(
                 [
-                  t.Literal("PENDING"),
-                  t.Literal("IN_PROGRESS"),
-                  t.Literal("DONE"),
+                  t.Literal("pending"),
+                  t.Literal("in_progress"),
+                  t.Literal("done"),
                 ],
                 { additionalProperties: false },
               ),
               priority: t.Union(
-                [t.Literal("LOW"), t.Literal("MEDIUM"), t.Literal("HIGH")],
+                [t.Literal("low"), t.Literal("medium"), t.Literal("high")],
                 { additionalProperties: false },
               ),
               dueDate: t.Date(),

@@ -1,4 +1,5 @@
 import { Elysia, t } from 'elysia'
+import { cors } from '@elysiajs/cors'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { Pool } from 'pg'
 
@@ -16,6 +17,17 @@ const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })
 
 const app = new Elysia()
+
+/* ✅ เปิด CORS ตรงนี้ */
+app.use(
+  cors({
+    origin: [
+      'http://localhost:3000', // FE (Next.js)
+      'http://localhost:3001', // เผื่อเรียกเอง
+    ],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  })
+)
 
 app
   // CREATE
@@ -46,16 +58,16 @@ app
       query: t.Object({
         status: t.Optional(
           t.Union([
-            t.Literal('PENDING'),
-            t.Literal('IN_PROGRESS'),
-            t.Literal('DONE')
+            t.Literal('pending'),
+            t.Literal('in_progress'),
+            t.Literal('done')
           ])
         ),
         priority: t.Optional(
           t.Union([
-            t.Literal('LOW'),
-            t.Literal('MEDIUM'),
-            t.Literal('HIGH')
+            t.Literal('low'),
+            t.Literal('medium'),
+            t.Literal('high')
           ])
         )
       }),
@@ -122,7 +134,7 @@ app
     }
   )
 
-/* 🔥 สำคัญที่สุด */
+/* 🔥 start server */
 if (import.meta.main) {
   app.listen(3001)
   console.log('🦊 Task API running at http://localhost:3001')
