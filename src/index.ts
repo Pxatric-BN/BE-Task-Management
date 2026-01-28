@@ -46,7 +46,7 @@ app
       query: t.Object({
         status: t.Optional(
           t.Union([
-            t.Literal('TODO'),
+            t.Literal('PENDING'),
             t.Literal('IN_PROGRESS'),
             t.Literal('DONE')
           ])

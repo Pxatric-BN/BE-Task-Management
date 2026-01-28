@@ -10,7 +10,7 @@ export const TaskPlain = t.Object(
     title: t.String(),
     description: __nullable__(t.String()),
     status: t.Union(
-      [t.Literal("TODO"), t.Literal("IN_PROGRESS"), t.Literal("DONE")],
+      [t.Literal("PENDING"), t.Literal("IN_PROGRESS"), t.Literal("DONE")],
       { additionalProperties: false },
     ),
     priority: t.Union(
@@ -32,7 +32,7 @@ export const TaskPlainInputCreate = t.Object(
     description: t.Optional(__nullable__(t.String())),
     status: t.Optional(
       t.Union(
-        [t.Literal("TODO"), t.Literal("IN_PROGRESS"), t.Literal("DONE")],
+        [t.Literal("PENDING"), t.Literal("IN_PROGRESS"), t.Literal("DONE")],
         { additionalProperties: false },
       ),
     ),
@@ -52,7 +52,7 @@ export const TaskPlainInputUpdate = t.Object(
     description: t.Optional(__nullable__(t.String())),
     status: t.Optional(
       t.Union(
-        [t.Literal("TODO"), t.Literal("IN_PROGRESS"), t.Literal("DONE")],
+        [t.Literal("PENDING"), t.Literal("IN_PROGRESS"), t.Literal("DONE")],
         { additionalProperties: false },
       ),
     ),
@@ -87,7 +87,7 @@ export const TaskWhere = t.Partial(
           title: t.String(),
           description: t.String(),
           status: t.Union(
-            [t.Literal("TODO"), t.Literal("IN_PROGRESS"), t.Literal("DONE")],
+            [t.Literal("PENDING"), t.Literal("IN_PROGRESS"), t.Literal("DONE")],
             { additionalProperties: false },
           ),
           priority: t.Union(
@@ -137,7 +137,7 @@ export const TaskWhereUnique = t.Recursive(
               description: t.String(),
               status: t.Union(
                 [
-                  t.Literal("TODO"),
+                  t.Literal("PENDING"),
                   t.Literal("IN_PROGRESS"),
                   t.Literal("DONE"),
                 ],

@@ -5,6 +5,6 @@ import { __transformDate__ } from "./__transformDate__";
 import { __nullable__ } from "./__nullable__";
 
 export const TaskStatus = t.Union(
-  [t.Literal("TODO"), t.Literal("IN_PROGRESS"), t.Literal("DONE")],
+  [t.Literal("PENDING"), t.Literal("IN_PROGRESS"), t.Literal("DONE")],
   { additionalProperties: false },
 );

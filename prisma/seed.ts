@@ -1,4 +1,4 @@
-import { PrismaClient } from '../generated/prisma/client'
+import { PrismaClient, TaskPriority, TaskStatus } from '../generated/prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { Pool } from 'pg'
 
@@ -17,20 +17,20 @@ async function main() {
       {
         title: 'Design homepage',
         description: 'Create wireframe and UI design',
-        status: 'TODO',
-        priority: 'HIGH',
+        status: TaskStatus.PENDING,
+        priority: TaskPriority.HIGH,
         dueDate: new Date('2026-02-01'),
       },
       {
         title: 'Implement API',
-        status: 'IN_PROGRESS',
-        priority: 'MEDIUM',
+        status: TaskStatus.PENDING,
+        priority: TaskPriority.LOW,
         dueDate: new Date('2026-02-05'),
       },
       {
         title: 'Write tests',
-        status: 'DONE',
-        priority: 'LOW',
+        status: TaskStatus.DONE,
+        priority: TaskPriority.LOW,
         dueDate: new Date('2026-01-20'),
       },
     ],
