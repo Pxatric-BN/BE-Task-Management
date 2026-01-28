@@ -44,36 +44,46 @@ app
 
   // READ (filter)
   .get(
-    '/tasks',
-    async ({ query }) => {
-      return prisma.task.findMany({
-        where: {
-          status: query.status,
-          priority: query.priority
-        },
-        orderBy: { createdAt: 'desc' }
-      })
-    },
-    {
-      query: t.Object({
-        status: t.Optional(
-          t.Union([
-            t.Literal('pending'),
-            t.Literal('in_progress'),
-            t.Literal('done')
-          ])
-        ),
-        priority: t.Optional(
-          t.Union([
-            t.Literal('low'),
-            t.Literal('medium'),
-            t.Literal('high')
-          ])
-        )
-      }),
-      response: t.Array(TaskPlain)
-    }
-  )
+  '/tasks',
+  async ({ query }) => {
+    const { search, status, priority } = query
+
+    return prisma.task.findMany({
+      where: {
+        status,
+        priority,
+        ...(search && {
+          OR: [
+            { title: { contains: search, mode: 'insensitive' } },
+            { description: { contains: search, mode: 'insensitive' } }
+          ]
+        })
+      },
+      orderBy: { createdAt: 'desc' }
+    })
+  },
+  {
+    query: t.Object({
+      search: t.Optional(t.String()),
+      status: t.Optional(
+        t.Union([
+          t.Literal('pending'),
+          t.Literal('in_progress'),
+          t.Literal('done')
+        ])
+      ),
+      priority: t.Optional(
+        t.Union([
+          t.Literal('low'),
+          t.Literal('medium'),
+          t.Literal('high')
+        ])
+      )
+    }),
+    response: t.Array(TaskPlain)
+  }
+)
+
 
   // READ by id
   .get(
