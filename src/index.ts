@@ -18,12 +18,11 @@ const prisma = new PrismaClient({ adapter })
 
 const app = new Elysia()
 
-/* ✅ เปิด CORS ตรงนี้ */
 app.use(
   cors({
     origin: [
-      'http://localhost:3000', // FE (Next.js)
-      'http://localhost:3001', // เผื่อเรียกเอง
+      'http://localhost:3000', 
+      'http://localhost:3001',
     ],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   })

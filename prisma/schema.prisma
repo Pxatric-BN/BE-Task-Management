@@ -25,6 +25,28 @@ model Task {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
+
+    // ===== ADD: Jira-like fields =====
+  projectId   String?
+  reporterId  String?
+  assigneeId  String?      // Assignee = 1 คน
+  progress    Int          @default(0)  // 0..100 (ProgressBar)
+  position    Int          @default(1000) // สำหรับ Kanban ordering/drag drop
+
+  // relations
+  project     Project?     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  reporter    User?        @relation("TaskReporter", fields: [reporterId], references: [id])
+  assignee    User?        @relation("TaskAssignee", fields: [assigneeId], references: [id])
+
+  tags        TaskTag[]
+  comments    Comment[]
+  attachments Attachment[]
+
+  @@index([projectId, status])
+  @@index([assigneeId])
+  @@index([reporterId])
+  @@index([dueDate])
+
   @@map("tasks")
 }
 
@@ -32,10 +54,232 @@ enum TaskStatus {
   pending
   in_progress
   done
+  review
 }
 
 enum TaskPriority {
   low
   medium
   high
+}
+
+// ================================
+// ADD: Auth & User Management
+// ================================
+
+enum ProjectRole {
+  owner
+  member
+}
+
+enum InviteStatus {
+  pending
+  accepted
+  expired
+  revoked
+}
+
+enum AuthProvider {
+  local
+  google
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  username     String?  @unique
+  passwordHash String?
+  displayName  String?
+  bio          String?
+  avatarUrl    String?  // local: /uploads/avatars/xxx.png
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // relations
+  accounts      AuthAccount[]
+  sessions      RefreshToken[]
+
+  ownedProjects Project[]       @relation("ProjectOwner")
+  memberships   ProjectMember[]
+  invitesSent   ProjectInvite[] @relation("InviteInviter")
+
+  reportedTasks Task[]          @relation("TaskReporter")
+  assignedTasks Task[]          @relation("TaskAssignee")
+
+  comments     Comment[]
+  attachments  Attachment[]
+
+  @@map("users")
+  @@index([createdAt])
+}
+
+model AuthAccount {
+  id         String       @id @default(uuid())
+  provider   AuthProvider
+  providerId String
+  userId     String
+  createdAt  DateTime     @default(now())
+
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerId])
+  @@index([userId])
+  @@map("auth_accounts")
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    // เก็บ hash ของ refresh token
+  createdAt DateTime  @default(now())
+  expiresAt DateTime
+  revokedAt DateTime?
+  userAgent String?
+  ipAddress String?
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
+}
+
+
+// ================================
+// ADD: Project Workspace
+// ================================
+
+model Project {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  ownerId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner       User           @relation("ProjectOwner", fields: [ownerId], references: [id])
+  members     ProjectMember[]
+  invites     ProjectInvite[]
+  tasks       Task[]
+  tags        Tag[]
+
+  @@index([ownerId])
+  @@map("projects")
+}
+
+model ProjectMember {
+  id        String      @id @default(uuid())
+  projectId String
+  userId    String
+  role      ProjectRole @default(member)
+  joinedAt  DateTime    @default(now())
+
+  project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@index([userId])
+  @@index([projectId])
+  @@map("project_members")
+}
+
+model ProjectInvite {
+  id           String       @id @default(uuid())
+  projectId    String
+  inviterId    String
+  inviteeEmail String
+  token        String       @unique
+  status       InviteStatus @default(pending)
+  expiresAt    DateTime
+  createdAt    DateTime     @default(now())
+  acceptedAt   DateTime?
+
+  project      Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  inviter      User         @relation("InviteInviter", fields: [inviterId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([inviteeEmail])
+  @@index([expiresAt])
+  @@map("project_invites")
+}
+
+
+// ================================
+// ADD: Tags (many-to-many with tasks)
+// ================================
+
+model Tag {
+  id        String   @id @default(uuid())
+  projectId String
+  name      String
+  color     String?
+  createdAt DateTime @default(now())
+
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tasks     TaskTag[]
+
+  @@unique([projectId, name])
+  @@index([projectId])
+  @@map("tags")
+}
+
+model TaskTag {
+  id     String @id @default(uuid())
+  taskId String
+  tagId  String
+
+  task   Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  tag    Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, tagId])
+  @@index([taskId])
+  @@index([tagId])
+  @@map("task_tags")
+}
+
+
+
+// ================================
+// ADD: Collaboration (Comments & Attachments)
+// ================================
+
+model Comment {
+  id        String   @id @default(uuid())
+  taskId    String
+  authorId  String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  attachments Attachment[]
+
+  @@index([taskId])
+  @@index([authorId])
+  @@map("comments")
+}
+
+model Attachment {
+  id         String   @id @default(uuid())
+  uploaderId String
+  taskId     String?
+  commentId  String?
+
+  fileName   String
+  mimeType   String
+  size       Int
+  storageKey String   // local path key เช่น "tasks/{taskId}/{uuid}.pdf"
+  url        String?  // เช่น "/uploads/tasks/{taskId}/{uuid}.pdf"
+  createdAt  DateTime @default(now())
+
+  uploader   User     @relation(fields: [uploaderId], references: [id], onDelete: Cascade)
+  task       Task?    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  comment    Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@index([uploaderId])
+  @@index([taskId])
+  @@index([commentId])
+  @@map("attachments")
 }
