@@ -15,9 +15,10 @@ import {
   listProjectTasks,
   updateProjectTask,
 } from './tasks.service'
+import { authGuard } from '../../middleware/auth.guard'
 
 export const tasksRoutes = new Elysia()
-
+  .use(authGuard)
   // ✅ List + filter/sort/search
   .get(
     '/projects/:projectId/tasks',

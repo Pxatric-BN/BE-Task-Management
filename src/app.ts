@@ -4,6 +4,7 @@ import { cors } from '@elysiajs/cors'
 import { projectsRoutes } from './modules/projects/projects.routes'
 import { tasksRoutes } from './modules/tasks/tasks.routes'
 import { meRoutes } from './modules/me/me.routes'
+import { authRoutes } from './modules/auth/auth.routes'
 
 export const app = new Elysia()
   .use(
@@ -16,6 +17,7 @@ export const app = new Elysia()
   .get('/health', () => ({ ok: true }))
 
   // routes
+  .use(authRoutes)
   .use(projectsRoutes)
   .use(tasksRoutes)
   .use(meRoutes)
