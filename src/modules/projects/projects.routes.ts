@@ -1,17 +1,19 @@
 import { Elysia } from 'elysia'
+import { authGuard } from '../../middleware/auth.guard'
 import { CreateProjectBody } from './projects.dto'
 import { createProject, listProjects } from './projects.service'
-import { authGuard } from '../../middleware/auth.guard'
 
 export const projectsRoutes = new Elysia({ prefix: '/projects' })
   .use(authGuard)
-  .get('/', async () => {
-    return listProjects()
+
+  .get('/', async ({ userId }) => {
+    return listProjects(userId)
   })
+
   .post(
     '/',
-    async ({ body }) => {
-      return createProject(body)
+    async ({ body, userId }) => {
+      return createProject({ userId, ...body })
     },
     { body: CreateProjectBody }
   )

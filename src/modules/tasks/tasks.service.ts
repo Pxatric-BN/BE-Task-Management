@@ -1,6 +1,5 @@
 import { TaskPriority, TaskStatus } from '../../../generated/prisma/client'
 import { prisma } from '../../db/prisma'
-import { getMockUserId } from '../projects/projects.service'
 
 export async function listProjectTasks(args: {
   projectId: string
@@ -56,13 +55,13 @@ export async function createProjectTask(args: {
     priority?: TaskPriority
     dueDate: string
     assigneeId?: string
-    reporterId?: string
+    reporterId: string // ✅ บังคับ
     progress?: number
     position?: number
   }
 }) {
-  const reporterId = args.body.reporterId ?? (await getMockUserId())
-  if (!reporterId) throw new Error('No user found. Seed users first.')
+  const reporterId = args.body.reporterId
+  if (!reporterId) throw new Error('Unauthorized') // กันหลุดแบบปลอดภัย
 
   return prisma.task.create({
     data: {
@@ -81,6 +80,7 @@ export async function createProjectTask(args: {
     },
   })
 }
+
 
 export async function updateProjectTask(args: {
   projectId: string

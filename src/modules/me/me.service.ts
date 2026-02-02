@@ -1,21 +1,16 @@
 import { TaskPriority, TaskStatus } from '../../../generated/prisma/client'
 import { prisma } from '../../db/prisma'
-import { getMockUserId } from '../projects/projects.service'
 
-export async function listMyTasks(query: {
-  userId?: string
+export async function listMyTasks(userId: string, query: {
   search?: string
   status?: TaskStatus
   priority?: TaskPriority
 }) {
-  const me = query.userId ?? (await getMockUserId())
-  if (!me) throw new Error('No user found. Seed users first.')
-
   const search = query.search?.trim()
 
   return prisma.task.findMany({
     where: {
-      assigneeId: me,
+      assigneeId: userId,
       ...(query.status ? { status: query.status } : {}),
       ...(query.priority ? { priority: query.priority } : {}),
       ...(search

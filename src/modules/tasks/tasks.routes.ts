@@ -1,4 +1,6 @@
 import { Elysia } from 'elysia'
+import { authGuard } from '../../middleware/auth.guard'
+import { projectGuard } from '../../middleware/project.guard'
 import {
   CalendarQuery,
   CreateProjectTaskBody,
@@ -15,11 +17,11 @@ import {
   listProjectTasks,
   updateProjectTask,
 } from './tasks.service'
-import { authGuard } from '../../middleware/auth.guard'
 
 export const tasksRoutes = new Elysia()
   .use(authGuard)
-  // ✅ List + filter/sort/search
+  .use(projectGuard)
+
   .get(
     '/projects/:projectId/tasks',
     async ({ params, query }) => {
@@ -28,16 +30,17 @@ export const tasksRoutes = new Elysia()
     { params: ProjectIdParams, query: ListProjectTasksQuery }
   )
 
-  // ✅ Create
   .post(
     '/projects/:projectId/tasks',
-    async ({ params, body }) => {
-      return createProjectTask({ projectId: params.projectId, body })
+    async ({ params, body, userId }) => {
+      return createProjectTask({
+        projectId: params.projectId,
+        body: { ...body, reporterId: userId },
+      })
     },
     { params: ProjectIdParams, body: CreateProjectTaskBody }
   )
 
-  // ✅ Update
   .patch(
     '/projects/:projectId/tasks/:taskId',
     async ({ params, body }) => {
@@ -50,7 +53,6 @@ export const tasksRoutes = new Elysia()
     { params: TaskIdParams, body: UpdateProjectTaskBody }
   )
 
-  // ✅ Delete
   .delete(
     '/projects/:projectId/tasks/:taskId',
     async ({ params }) => {
@@ -59,7 +61,6 @@ export const tasksRoutes = new Elysia()
     { params: TaskIdParams }
   )
 
-  // ✅ Board
   .get(
     '/projects/:projectId/board',
     async ({ params }) => {
@@ -68,7 +69,6 @@ export const tasksRoutes = new Elysia()
     { params: ProjectIdParams }
   )
 
-  // ✅ Calendar
   .get(
     '/projects/:projectId/calendar',
     async ({ params, query }) => {
